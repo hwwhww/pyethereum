@@ -8,6 +8,7 @@ with open('README.rst') as readme_file:
 install_requires = set(x.strip() for x in open('requirements.txt'))
 install_requires_replacements = {
     'https://github.com/ethereum/ethash/tarball/master': 'pyethash',
+    'git+git://github.com/ethereum/py_pairing.git@master#egg=py_ecc': 'py_ecc'
 }
 install_requires = [install_requires_replacements.get(r, r) for r in install_requires]
 
@@ -18,6 +19,8 @@ tests_require_replacements = {
     'https://github.com/ethereum/serpent/tarball/develop': 'ethereum-serpent>=2.0.4'
 }
 tests_require = [tests_require_replacements.get(r, r) for r in tests_require]
+DEPENDENCY_LINKS = []
+DEPENDENCY_LINKS.append('http://github.com/ethereum/py_pairing/tarball/master#egg=py_ecc-9.99.9')
 
 # *IMPORTANT*: Don't manually change the version here. Use the 'bumpversion' utility.
 # see: https://github.com/ethereum/pyethapp/wiki/Development:-Versions-and-Releases
@@ -31,6 +34,7 @@ setup(
     url='https://github.com/ethereum/pyethereum/',
     install_requires=install_requires,
     tests_require=tests_require,
+    dependency_links=DEPENDENCY_LINKS,
     setup_requires=[
     #    'pytest-runner==2.7'
     ],
