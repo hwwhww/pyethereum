@@ -14,7 +14,7 @@ from ethereum.exceptions import InvalidNonce, InsufficientStartGas, UnsignedTran
 from ethereum.slogging import get_logger, configure_logging
 from ethereum.config import Env
 from ethereum.state import State, dict_to_prev_header
-from ethereum.block import Block, BlockHeader, BLANK_UNCLES_HASH
+from ethereum.block import Block, BlockHeader, BLANK_UNCLES_HASH, FakeHeader
 from ethereum.pow.consensus import initialize
 from ethereum.genesis_helpers import mk_basic_state, state_from_genesis_declaration, \
     initialize_genesis_keys
@@ -79,7 +79,12 @@ class Chain(object):
         self.head_hash = self.state.prev_headers[0].hash
         assert self.state.block_number == self.state.prev_headers[0].number
         if reset_genesis:
-            self.genesis = Block(self.state.prev_headers[0], [], [])
+            # FakeHeader couldn't be rlp.Serializable
+            if isinstance(self.state.prev_headers[0], FakeHeader):
+                header = self.state.prev_headers[0].to_block_header()
+            else:
+                header = self.state.prev_headers[0]
+            self.genesis = Block(header)
             initialize_genesis_keys(self.state, self.genesis)
         else:
             self.genesis = self.get_block_by_number(0)

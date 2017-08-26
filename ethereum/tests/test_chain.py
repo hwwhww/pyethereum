@@ -13,6 +13,7 @@ from ethereum.tests.utils import new_db
 from ethereum.state import State
 from ethereum.block import Block
 from ethereum.consensus_strategy import get_consensus_strategy
+from ethereum.snapshot import create_snapshot, load_snapshot
 
 from ethereum.slogging import get_logger
 logger = get_logger()
@@ -353,6 +354,23 @@ def test_reward_uncles(db):
         chain.env.config['NEPHEW_REWARD']
     assert chain.state.get_balance(
         uncle_coinbase) == chain.env.config['BLOCK_REWARD'] * 7 // 8
+
+
+def test_genesis_from_state_snapshot():
+    """
+    Test if Chain could be initilaized from State snapshot
+    """
+    k, v, k2, v2 = accounts()
+    chain = Chain({v: {"balance": utils.denoms.ether * 1}}, difficulty=1)
+    tx = get_transaction()
+    blk2 = mine_next_block(chain, transactions=[tx])
+    blk3 = mine_next_block(chain)
+    assert blk2.hash in chain
+
+    genesis = chain.state.to_snapshot()
+    other_chain = Chain(genesis=genesis)
+    assert other_chain.state.trie.root_hash == chain.state.trie.root_hash
+    assert other_chain.head_hash == chain.head_hash
 
 
 # TODO ##########################################
