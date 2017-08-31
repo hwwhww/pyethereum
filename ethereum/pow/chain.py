@@ -245,6 +245,13 @@ class Chain(object):
             if len(self.time_queue) == pre_len:
                 i += 1
 
+    def process_parent_queue(self):
+        for parent_hash, blocks in self.parent_queue.items():
+            if parent_hash in self.db:
+                for block in blocks:
+                    self.add_block(block)
+                del self.parent_queue[parent_hash]
+
     # Call upon receiving a block
     def add_block(self, block):
         now = self.localtime
