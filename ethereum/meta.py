@@ -8,6 +8,7 @@ from ethereum.consensus_strategy import get_consensus_strategy
 from ethereum.messages import apply_transaction
 from ethereum.state import State
 from ethereum.utils import sha3, encode_hex
+from ethereum.config import IS_SIM
 import rlp
 
 
@@ -21,12 +22,15 @@ def apply_block(state, block):
         cs.initialize(state, block)
         # Basic validation
         assert validate_header(state, block.header)
-        assert cs.check_seal(state, block.header)
+        if not IS_SIM:
+            assert cs.check_seal(state, block.header)
         assert cs.validate_uncles(state, block)
         assert validate_transaction_tree(state, block)
         # Process transactions
         for tx in block.transactions:
-            apply_transaction(state, tx)
+            success, output = apply_transaction(state, tx)
+            if IS_SIM:
+                print('success: {}, output: {}'.format(success, output))
         # Finalize (incl paying block rewards)
         cs.finalize(state, block)
         # Verify state root, tx list root, receipt root

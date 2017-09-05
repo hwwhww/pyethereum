@@ -6,6 +6,9 @@ from ethereum.child_dao_list import L as child_dao_list
 import copy
 
 
+IS_SIM = True
+
+
 default_config = dict(
     # Genesis block difficulty
     GENESIS_DIFFICULTY=131072,

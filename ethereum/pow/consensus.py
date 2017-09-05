@@ -1,8 +1,10 @@
 from ethereum.pow import ethash, ethash_utils, ethpow
 from ethereum import utils
 from ethereum.common import update_block_env_variables, calc_difficulty
+from ethereum.config import IS_SIM
 from ethereum.exceptions import VerificationFailed
 import rlp
+
 
 
 # Block initialization state transition
@@ -100,8 +102,12 @@ def validate_uncles(state, block):
             raise VerificationFailed("Duplicate uncle")
         if uncle.gas_used > uncle.gas_limit:
             raise VerificationFailed("Uncle used too much gas")
-        if not check_pow(state, uncle):
-            raise VerificationFailed('uncle pow mismatch')
+
+        # TODO: It's only in sim branch for sharding simulation
+        if not IS_SIM:
+            if not check_pow(state, uncle):
+                raise VerificationFailed('uncle pow mismatch')
+
         ineligible.append(uncle.hash)
     return True
 
