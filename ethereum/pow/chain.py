@@ -257,6 +257,8 @@ class Chain(object):
 
     # Call upon receiving a block
     def add_block(self, block):
+        # FIXME: efficient?
+        self.localtime = time.time()
         now = self.localtime
         # Are we receiving the block too early?
         if block.header.timestamp > now:

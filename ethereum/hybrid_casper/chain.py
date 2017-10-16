@@ -220,6 +220,7 @@ class Chain(object):
 
     def should_add_block(self, block):
         # Check that the block wasn't recieved too early
+        self.localtime = time.time()
         now = self.localtime
         if block.header.timestamp > now:
             i = 0
